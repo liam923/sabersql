@@ -1,17 +1,20 @@
 #!/usr/bin/env python
+import os
 import subprocess
 
-def _download(url, target):
+def _download(url, target, overwrite=False):
     """
     Synchronously downloads a file to a given location
 
     :param url: the url of the file to download
     :param target: the location to download the file to
+    :param overwrite: if True, the file will be overwritten if it already exists (default False)
     :return: None
     """
 
-
-    pass
+    _shell("mkdir -p \"%s\"" % os.path.dirname(target))
+    if overwrite or not os.path.isfile(target):
+        _shell("curl \"%s\" -L -s --connect-timeout 3 -o \"%s\"" % (url, target))
 
 def _shell(command):
     """

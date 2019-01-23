@@ -16,7 +16,7 @@ class SDownloader:
         """
         self._path = path
 
-    def download(self, year=None, handler=None):
+    def download(self, year=None, handler=lambda *args: None):
         """
         Downloads Statcast files
 
