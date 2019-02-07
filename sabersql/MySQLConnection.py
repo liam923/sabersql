@@ -1,4 +1,6 @@
 from Utilities import _shell
+import Schemas
+import math
 
 class MySQLConnection:
     """
@@ -29,13 +31,14 @@ class MySQLConnection:
         :raises ConnectionError: if the connection fails
         """
 
-        stdOut, stdErr = _shell("mysql -u%s -p%s %s -B -e %s" % (self.username, self.password, self.database, command))
+        stdOut, stdErr = _shell("export MYSQL_PWD=%s; mysql -u%s %s -B -e \"%s\"" %
+                                (self.password, self.username, self.database, command))
         if stdErr:
             if_port = ""
             if self.port:
                 if_port = ":%s" % self.port
-            raise ConnectionError("Failed to connect to MySQL database %s at %s@%s%s" %
-                                  (self.database, self.username, self.address, if_port))
+            raise ConnectionError("Failed to connect to MySQL database %s at %s@%s%s : %s" %
+                                  (self.database, self.username, self.address, if_port, stdErr))
         else:
             return stdOut
 
@@ -46,4 +49,24 @@ class MySQLConnection:
         :raises ConnectionError: if the connection fails
         """
 
-        self.__run("create database if not exists %s" % (self.database))
+        self.__run("create database if not exists %s;" % (self.database))
+        for schema in Schemas.schemas:
+            self.__run(schema)
+
+    def import_data(self, table, headers, data, batch_size=100):
+        """
+        Imports data into a given table.
+        :param table: the name of the table to add data to
+        :param headers: the column names of the values to add, as an array of strings
+        :param data: the values to add to the table, as an array of arrays of strings that are the value literal
+        :param batch_size: how many values to send at once
+        :raises ConnectionError: if the connection fails
+        """
+
+        for i in range(0, math.ceil(len(data) / batch_size)):
+            command = "INSERT INTO %s (" % table
+            command += ','.join(headers)
+            command += ") VALUES"
+            command += ','.join(["(" + ','.join(row) + ")" for row in data[batch_size*i:min(batch_size*(i + 1), len(data))]])
+            command += ";"
+            self.__run(command)
