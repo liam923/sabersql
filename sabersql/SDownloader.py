@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 import os
 from datetime import datetime
 from Utilities import _download
