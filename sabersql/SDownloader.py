@@ -12,17 +12,17 @@ class SDownloader:
     def __init__(self, path):
         """
         Initializes a SDownloader based on the path to the SaberSQL data
+
         :param path: the path to the folder for all SaberSQL data
         """
         self._path = path
 
     def download(self, year=None, handler=lambda *args: None):
         """
-        Downloads Statcast files
+        Downloads BaseballSavant files
 
         :param year: the year to be downloaded; defaults to all years 1999 to present
         :param handler: a function that takes in a double, representing the completion percentage of the download
-        :return: None
         """
 
         if year:

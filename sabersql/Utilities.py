@@ -1,5 +1,6 @@
 
 import os
+import pandas
 import subprocess
 
 def _download(url, target, overwrite=False):
@@ -15,6 +16,28 @@ def _download(url, target, overwrite=False):
     _shell("mkdir -p \"%s\"" % os.path.dirname(target))
     if overwrite or not os.path.isfile(target):
         _shell("curl \"%s\" -L -s --connect-timeout 3 -o \"%s\"" % (url, target))
+
+def _import_csv(path, header=None):
+    """
+    Reads a csv file into memory
+
+    :param path: the path to the csv
+    :param header: the header for the file (as array of strings); if None (default), the headers will come from the first line of the file
+    :return: a pandas DataFrame of the csv
+    """
+
+    if header:
+        return pandas.read_csv(path, header=None, names=header)
+    else:
+        dataframe = pandas.read_csv(path)
+        names_so_far = set()
+        for col in dataframe.columns:
+            if col in names_so_far:
+                dataframe = dataframe.drop(columns=col)
+            else:
+                names_so_far.add(col + ".1")
+        return dataframe
+
 
 def _shell(command):
     """

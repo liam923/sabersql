@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__pitch = """
+_pitch = """
 CREATE TABLE IF NOT EXISTS pitch (
 
   pitch_id INT AUTO_INCREMENT,
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS pitch (
   game_year SMALLINT COMMENT \'Year game took place.\',
   pfx_x DECIMAL(5,4) COMMENT \'Horizontal movement in feet from the catcher\\\'s perspective.\',
   pfx_z DECIMAL(5,4) COMMENT \'Vertical movement in feet from the catcher\\\'s perpsective.\',
-  plate_x DECIMAL(5,4) COMMENT \'Horizontal position of the ball when it crosses home plate from the catcher\\\'s perspective.\',
-  plate_z DECIMAL(5,4) COMMENT \'Vertical position of the ball when it crosses home plate from the catcher\\\'s perspective.\',
+  plate_x DECIMAL(6,4) COMMENT \'Horizontal position of the ball when it crosses home plate from the catcher\\\'s perspective.\',
+  plate_z DECIMAL(6,4) COMMENT \'Vertical position of the ball when it crosses home plate from the catcher\\\'s perspective.\',
   on_3b MEDIUMINT COMMENT \'Pre-pitch MLB Player Id of Runner on 3B.\',
   on_2b MEDIUMINT COMMENT \'Pre-pitch MLB Player Id of Runner on 2B.\',
   on_1b MEDIUMINT COMMENT \'Pre-pitch MLB Player Id of Runner on 1B.\',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS pitch (
   tfs_zulu_deprecated CHAR(0) COMMENT \'* Deprecated field from old tracking system.\',
   umpire CHAR(0) COMMENT \'* Deprecated field from old tracking system.\',
   sv_id VARCHAR(15) COMMENT \'Non-unique Id of play event per game.\',
-  vx0 DECIMAL(5,4) COMMENT \'The velocity of the pitch, in feet per second, in x-dimension, determined at y=50 feet.\',
+  vx0 DECIMAL(5,3) COMMENT \'The velocity of the pitch, in feet per second, in x-dimension, determined at y=50 feet.\',
   vy0 DECIMAL(7,4) COMMENT \'The velocity of the pitch, in feet per second, in y-dimension, determined at y=50 feet.\',
   vz0 DECIMAL(6,4) COMMENT \'The velocity of the pitch, in feet per second, in z-dimension, determined at y=50 feet.\',
   ax DECIMAL(6,4) COMMENT \'The acceleration of the pitch, in feet per second per second, in x-dimension, determined at y=50 feet.\',
@@ -55,11 +55,11 @@ CREATE TABLE IF NOT EXISTS pitch (
   az DECIMAL(6,4) COMMENT \'The acceleration of the pitch, in feet per second per second, in z-dimension, determined at y=50 feet.\',
   sz_top DECIMAL(5,4) COMMENT \'Top of the batter\\\'s strike zone set by the operator when the ball is halfway to the plate.\',
   sz_bot DECIMAL(5,4) COMMENT \'Bottom of the batter\\\'s strike zone set by the operator when the ball is halfway to the plate.\',
-  hit_distance SMALLINT COMMENT \'Projected hit distance of the batted ball.\',
+  hit_distance_sc SMALLINT COMMENT \'Projected hit distance of the batted ball.\',
   launch_speed DECIMAL(4,1) COMMENT \'Exit velocity of the batted ball as tracked by Statcast. For the limited subset of batted balls not tracked directly, estimates are included based on the process described here.\',
   launch_angle TINYINT COMMENT \'Launch angle of the batted ball as tracked by Statcast. For the limited subset of batted balls not tracked directly, estimates are included based on the process described here.\',
   effective_speed DECIMAL(6,3) COMMENT \'Derived speed based on the the extension of the pitcher\\\'s release.\',
-  release_spin SMALLINT COMMENT \'Spin rate of pitch tracked by Statcast.\',
+  release_spin_rate SMALLINT COMMENT \'Spin rate of pitch tracked by Statcast.\',
   release_extension DECIMAL(5,3) COMMENT \'Release extension of pitch in feet as tracked by Statcast.\',
   game_pk MEDIUMINT COMMENT \'Unique Id for Game.\',
   fielder_2 MEDIUMINT COMMENT \'MLB Player Id for catcher.\',
@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS pitch (
   post_home_score TINYINT COMMENT \'Post-pitch home score\',
   post_away_score TINYINT COMMENT \'Post-pitch away score\',
   post_bat_score TINYINT COMMENT \'Post-pitch bat team score\',
+  post_fld_score TINYINT COMMENT \'Post-pitch field team score\',
   if_fielding_alignment VARCHAR(30) COMMENT \'Infield fielding alignment at the time of the pitch.\',
   of_fielding_alignment VARCHAR(30) COMMENT \'Outfield fielding alignment at the time of the pitch.\',
   PRIMARY KEY (pitch_id)
@@ -95,4 +96,4 @@ CREATE TABLE IF NOT EXISTS pitch (
 ) COMMENT \'Represents a pitch from Statcast data\';
 """
 
-schemas = [__pitch]
+schemas = [_pitch]
