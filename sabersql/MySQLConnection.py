@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+
 from Utilities import _shell
 import Schemas
-import math
 
 class MySQLConnection:
     """

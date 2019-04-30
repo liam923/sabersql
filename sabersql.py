@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
 
-from sabersql.__main__ import run
-run()
+import sys
+
+from sabersql.__main__ import main
+main(sys.argv)

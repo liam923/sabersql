@@ -96,4 +96,47 @@ CREATE TABLE IF NOT EXISTS pitch (
 ) COMMENT \'Represents a pitch from Statcast data\';
 """
 
-schemas = [_pitch]
+_person = """
+CREATE TABLE IF NOT EXISTS  person (
+  person_id VARCHAR(10) NOT NULL,
+  mlbam INT NULL,
+  bbref VARCHAR(20) NULL,
+  fangraphs VARCHAR(10) NULL,
+  retro VARCHAR(10) NULL,
+  lastname TEXT NULL,
+  firstname TEXT NULL,
+  givenname TEXT NULL,
+  nickname TEXT NULL,
+  matrilinealname TEXT NULL,
+  name_suffix TEXT NULL,
+  birth_month INT NULL,
+  birth_day INT NULL,
+  birth_year INT NULL,
+  death_month INT NULL,
+  death_day INT NULL,
+  death_year INT NULL,
+  pro_played_first INT NULL,
+  pro_played_last INT NULL,
+  mlb_played_first INT NULL,
+  mlb_played_last INT NULL,
+  col_played_first INT NULL,
+  col_played_last INT NULL,
+  pro_managed_first INT NULL,
+  pro_managed_last INT NULL,
+  mlb_managed_first INT NULL,
+  mlb_managed_last INT NULL,
+  col_managed_first INT NULL,
+  col_managed_last INT NULL,
+  pro_umpired_first INT NULL,
+  pro_umpired_last INT NULL,
+  mlb_umpired_first INT NULL,
+  mlb_umpired_last INT NULL,
+  PRIMARY KEY (person_id),
+  UNIQUE INDEX person_id_UNIQUE (person_id ASC),
+  UNIQUE INDEX mlbam_UNIQUE (mlbam ASC),
+  UNIQUE INDEX bbref_UNIQUE (bbref ASC),
+  UNIQUE INDEX fangraphs_UNIQUE (fangraphs ASC),
+  UNIQUE INDEX retro_UNIQUE (retro ASC));
+"""
+
+schemas = [_pitch, _person]

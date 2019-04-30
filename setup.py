@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'sabersql = sabersql.__main__:run',
+            'sabersql = sabersql.__main__:main',
         ],
     }
 )
