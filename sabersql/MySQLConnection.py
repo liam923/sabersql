@@ -35,20 +35,20 @@ class MySQLConnection:
         """
 
         if use_database:
-            stdOut, stdErr = _shell("export MYSQL_PWD=%s; mysql -u%s %s -B -e \"%s\"" %
+            stdout, stderr = _shell("export MYSQL_PWD=%s; mysql -u%s %s -B -e \"%s\"" %
                                     (self._password, self._username, self._database, command))
         else:
-            stdOut, stdErr = _shell("export MYSQL_PWD=%s; mysql -u%s -B -e \"%s\"" %
+            stdout, stderr = _shell("export MYSQL_PWD=%s; mysql -u%s -B -e \"%s\"" %
                                     (self._password, self._username, command))
 
-        if stdErr:
+        if stderr:
             if_port = ""
             if self._port:
                 if_port = ":%s" % self._port
             raise ConnectionError("Failed to connect to MySQL database %s at %s@%s%s : %s" %
-                                  (self._database, self._username, self._address, if_port, stdErr))
+                                  (self._database, self._username, self._address, if_port, stderr))
         else:
-            return stdOut
+            return stdout
 
 
     def create_database(self):
