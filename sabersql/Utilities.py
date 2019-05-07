@@ -30,7 +30,7 @@ def _import_csv(path, header=None):
     if header:
         return pandas.read_csv(path, header=None, names=header)
     else:
-        dataframe = pandas.read_csv(path)
+        dataframe = pandas.read_csv(path, low_memory=False)
         names_so_far = set()
         for col in dataframe.columns:
             if col in names_so_far:

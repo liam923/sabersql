@@ -5,6 +5,7 @@ import SImporter
 import PDownloader
 import PImporter
 import RDownloader
+import RImporter
 import MySQLConnection
 import sys
 
@@ -13,28 +14,32 @@ def main(args=None):
     path = args[1]
     password = args[2]
 
-    connection = MySQLConnection.MySQLConnection("root", password, "sabersql", "localhost")
+    connection = MySQLConnection.MySQLConnection("root", password, "sabersql", "127.0.0.1")
     connection.create_database()
 
-    # # download statcast data
-    # sdownloader = SDownloader.SDownloader(path)
-    # sdownloader.download(handler=print)
-    #
-    # # import statcast data
-    # simporter = SImporter.SImporter(path, connection)
-    # simporter.import_statcast_data(handler=print)
-    #
-    # # download people data
-    # pdownloader = PDownloader.PDownloader(path)
-    # pdownloader.download(handler=print)
-    #
-    # # import people data
-    # pimporter = PImporter.PImporter(path, connection)
-    # pimporter.import_people_data(handler=print)
+    # download statcast data
+    sdownloader = SDownloader.SDownloader(path)
+    sdownloader.download(handler=print)
+
+    # import statcast data
+    simporter = SImporter.SImporter(path, connection)
+    simporter.import_statcast_data(handler=print)
+
+    # download people data
+    pdownloader = PDownloader.PDownloader(path)
+    pdownloader.download(handler=print)
+
+    # import people data
+    pimporter = PImporter.PImporter(path, connection)
+    pimporter.import_people_data(handler=print)
 
     # download retrosheet data
     rdownloader = RDownloader.RDownloader(path)
     rdownloader.download(handler=print)
+
+    # import retrosheet data
+    rimporter = RImporter.RImporter(path, connection)
+    rimporter.import_retrosheet_data(handler=print)
 
 
 if __name__ == "__main__":
