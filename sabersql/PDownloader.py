@@ -27,5 +27,5 @@ class PDownloader:
         handler(0)
         source_url = "https://github.com/chadwickbureau/register/raw/master/data/people.csv"
         destination = os.path.join(self._path, "Person/people.csv")
-        _download(source_url, destination, True)
+        _download(source_url, destination)
         handler(1)

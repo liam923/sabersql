@@ -161,7 +161,7 @@ class RImporter:
                 else:
                     return str(cell)
             elif t is str:
-                if cell == "null" or cell == "":
+                if cell == "null" or cell == "" or cell == "(unknown)":
                     return "NULL"
                 else:
                     if table == "game" and (key == "INPUT_RECORD_TS" or key == "EDIT_RECORD_TS"):

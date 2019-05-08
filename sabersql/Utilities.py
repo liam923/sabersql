@@ -4,7 +4,7 @@ import os
 import pandas
 import subprocess
 
-def _download(url, target, overwrite=False):
+def _download(url, target, unzip=None, overwrite=False):
     """
     Synchronously downloads a file to a given location
 
@@ -15,8 +15,12 @@ def _download(url, target, overwrite=False):
     """
 
     _shell("mkdir -p \"%s\"" % os.path.dirname(target))
-    if overwrite or not os.path.isfile(target):
+
+    if overwrite or (not unzip and not os.path.isfile(target)) or (unzip and not os.path.isdir(unzip)):
         _shell("curl \"%s\" -L -s --connect-timeout 3 -o \"%s\"" % (url, target))
+        if unzip:
+            _shell("unzip \"%s\" -d \"%s\"" % (target, unzip))
+            _shell("rm \"%s\"" % target)
 
 def _import_csv(path, header=None):
     """

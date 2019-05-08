@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 from Utilities import _download
-from Utilities import _shell
+import time
 
 
 class RDownloader:
@@ -33,9 +33,7 @@ class RDownloader:
             years = [y for y in range(1903, datetime.now().year + 1)]
         paths = self.__download_paths(years)
         for i in range(0, len(paths)):
-            _download(*paths[i])
-            _shell("unzip \"%s\" -d \"%s\"" % (paths[i][1], paths[i][2]))
-            _shell("rm \"%s\"" % paths[i][1])
+            _download(paths[i][0], paths[i][1], unzip=paths[i][2])
             handler((i + 1) / len(paths))
 
     def __download_paths(self, years):
