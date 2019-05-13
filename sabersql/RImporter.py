@@ -42,7 +42,7 @@ class RImporter:
             self.__sql(year)
 
             year_prog += 1
-            handler(year_prog / len(years))
+            handler(year_prog / len(years), status="Importing %s" % year)
 
     def __chadwick(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "raw_event_files", "%s" % year)
@@ -100,6 +100,7 @@ class RImporter:
                 os.rmdir(os.path.join(out_folder, "AS"))
 
             self.__end_progress(in_folder)
+            self.__start_progress(out_folder)
 
     def __sql(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
