@@ -6,6 +6,7 @@ import Utilities
 import math
 import re
 import pandas
+from ProgressHandler import ProgressHandler
 
 
 class RImporter:
@@ -35,21 +36,22 @@ class RImporter:
         else:
             years = [y for y in range(1903, datetime.now().year + 1)]
 
-        processed_output_folder = os.path.join(self._path, "Retrosheet", "processed")
+        handler(0, status="Importing Retrosheet data")
         year_prog = 0
         for year in years:
             self.__chadwick(year)
             self.__sql(year)
 
             year_prog += 1
-            handler(year_prog / len(years), status="Importing %s" % year)
+            handler(year_prog / len(years), status="Importing Retrosheet data for %s" % year)
 
     def __chadwick(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "raw_event_files", "%s" % year)
         out_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
 
-        if self.__get_progress(in_folder) != "finished\n":
-            self.__start_progress(in_folder)
+        progress_handler = ProgressHandler(in_folder)
+        if progress_handler.get_progress() != ProgressHandler.FINISHED:
+            progress_handler.start_progress()
 
             # regular season
             Utilities._shell("mkdir -p \"%s\"" % os.path.join(out_folder, "REG"))
@@ -99,17 +101,18 @@ class RImporter:
             if len(os.listdir(os.path.join(out_folder, "AS"))) == 0:
                 os.rmdir(os.path.join(out_folder, "AS"))
 
-            self.__end_progress(in_folder)
-            self.__start_progress(out_folder)
+            progress_handler.end_progress()
+            ProgressHandler(out_folder).start_progress()
 
     def __sql(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
 
-        progress = self.__get_progress(in_folder)
-        if progress != "finished\n":
-            if progress == "started\n":
+        progress_handler = ProgressHandler(in_folder)
+        progress = progress_handler.get_progress()
+        if progress != ProgressHandler.FINISHED:
+            if progress == ProgressHandler.STARTED:
                 self.__undo_sql_import(year)
-            self.__start_progress(in_folder)
+            progress_handler.start_progress()
 
             for series in os.listdir(in_folder):
                 if series != "progress.dat" and series != ".DS_Store":
@@ -129,7 +132,7 @@ class RImporter:
                         self.__import_dataframe(games_data, "game", fields={"TYPE": series})
                         self.__import_dataframe(sub_data, "sub")
 
-            self.__end_progress(in_folder)
+            progress_handler.end_progress()
 
     def __import_dataframe(self, dataframe, table, fields={}):
         """
@@ -202,23 +205,6 @@ class RImporter:
                 yield make_row(row)
 
         self._connection.import_data(table, cols, make_data(dataframe), batch_size=100)
-
-    def __get_progress(self, folder):
-        try:
-            with open(os.path.join(folder, "progress.dat")) as f:
-                return f.readline()
-        except FileNotFoundError:
-            return "None"
-
-    def __start_progress(self, folder):
-        message = "started"
-        progress_file_path = os.path.join(folder, "progress.dat")
-        Utilities._shell("echo \"%s\" > \"%s\"" % (message, progress_file_path))
-
-    def __end_progress(self, folder):
-        message = "finished"
-        progress_file_path = os.path.join(folder, "progress.dat")
-        Utilities._shell("echo \"%s\" > \"%s\"" % (message, progress_file_path))
 
     def __undo_sql_import(self, year):
         """

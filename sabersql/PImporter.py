@@ -4,12 +4,13 @@ import os
 import Utilities
 import math
 import functools
+from ProgressHandler import ProgressHandler
 
 class PImporter:
 
     def __init__(self, path, connection):
         """
-        Initializes a PDownloader based on the path to the SaberSQL data and a MySQLConnection
+        Initializes a PImporter based on the path to the SaberSQL data and a MySQLConnection
 
         :param path: the path to the folder for all SaberSQL data
         :param connection: a MySQLConnection to the database to import data to
@@ -62,15 +63,19 @@ class PImporter:
         :raises ConnectionError: if the connection fails
         """
 
-        progress = self.__get_progress()
-        if progress != "finished\n":
-            if progress == "started\n":
+        status = "Importing people data"
+        handler(0, status=status)
+        progress_handler = ProgressHandler(os.path.join(self._path, "Person"))
+        progress = progress_handler.get_progress()
+        if progress != ProgressHandler.FINISHED:
+            if progress == ProgressHandler.STARTED:
                 self.__undo_sql_import()
-            self.__start_progress()
+            progress_handler.start_progress()
 
             self.__import_people_from_file(os.path.join(self._path, "Person", "people.csv"), handler)
 
-            self.__end_progress()
+            progress_handler.end_progress()
+        handler(1, status=status)
 
     def __import_people_from_file(self, url, handler):
         batch_size = 1000
@@ -113,23 +118,6 @@ class PImporter:
 
         self._connection.import_data("person", [x[1] for x in self.__key_pair], make_data(dataframe),
                                      batch_size=batch_size)
-
-    def __get_progress(self):
-        try:
-            with open(os.path.join(self._path, "Person", "progress.dat")) as f:
-                return f.readline()
-        except FileNotFoundError:
-            return "None"
-
-    def __start_progress(self):
-        message = "started"
-        progress_file_path = os.path.join(self._path, "Person", "progress.dat")
-        Utilities._shell("echo \"%s\" > \"%s\"" % (message, progress_file_path))
-
-    def __end_progress(self):
-        message = "finished"
-        progress_file_path = os.path.join(self._path, "Person", "progress.dat")
-        Utilities._shell("echo \"%s\" > \"%s\"" % (message, progress_file_path))
 
     def __undo_sql_import(self):
         """

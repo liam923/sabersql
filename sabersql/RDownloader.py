@@ -32,9 +32,11 @@ class RDownloader:
         else:
             years = [y for y in range(1903, datetime.now().year + 1)]
         paths = self.__download_paths(years)
+
+        handler(0, status="Downloading Retrosheet data")
         for i in range(0, len(paths)):
             _download(paths[i][0], paths[i][1], unzip=paths[i][2])
-            handler((i + 1) / len(paths))
+            handler((i + 1) / len(paths), status="Downloading Retrosheet data for %s" % paths[i][3])
 
     def __download_paths(self, years):
         """Gets all urls to download and paths to download them to"""
@@ -45,5 +47,5 @@ class RDownloader:
                 url = "https://www.retrosheet.org/events/%s%s.zip" % (year, type)
                 path = os.path.join(self._path, "Retrosheet/raw_event_files/%s/%s%s.zip" % (year, year, type))
                 folder = os.path.join(self._path, "Retrosheet/raw_event_files/%s/%s%s" % (year, year, type))
-                paths.append((url, path, folder))
+                paths.append((url, path, folder, year))
         return paths

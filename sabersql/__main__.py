@@ -56,48 +56,45 @@ def main(args=[]):
                                                      parsed['address'])
         connection.create_database()
 
-    if parsed['statcast']:
-        if parsed['download']:
-            sdownloader = SDownloader.SDownloader(path)
-            sdownloader.download(year=parsed['year'])
-            print("downloaded statcast")
-        if parsed['import']:
-            simporter = SImporter.SImporter(path, connection)
-            simporter.import_statcast_data(year=parsed['year'])
-            print("imported statcast")
-
     if parsed['people']:
         if parsed['download']:
             pdownloader = PDownloader.PDownloader(path)
-            pdownloader.download()
-            print("downloaded people")
+            pdownloader.download(handler=progress)
         if parsed['import']:
             pimporter = PImporter.PImporter(path, connection)
-            pimporter.import_people_data()
-            print("imported people")
+            pimporter.import_people_data(handler=progress)
+
+    if parsed['statcast']:
+        if parsed['download']:
+            sdownloader = SDownloader.SDownloader(path)
+            sdownloader.download(handler=progress, year=parsed['year'])
+        if parsed['import']:
+            simporter = SImporter.SImporter(path, connection)
+            simporter.import_statcast_data(handler=progress, year=parsed['year'])
 
     if parsed['retrosheet']:
         if parsed['download']:
             rdownloader = RDownloader.RDownloader(path)
-            rdownloader.download(year=parsed['year'])
-            print("downloaded retrosheet")
+            rdownloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
             rimporter = RImporter.RImporter(path, connection)
             rimporter.import_retrosheet_data(handler=progress, year=parsed['year'])
-            print("imported retrosheet")
 
 
 def progress(fraction, status=''):
-    bar_len = 60
+    bar_len = 40
     filled_len = int(round(bar_len * fraction))
 
     percents = round(100.0 * fraction, 1)
-    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+    bar = '=' * filled_len + ' ' * (bar_len - filled_len)
 
     text = '[%s] %s%% ...%s' % (bar, percents, status)
     sys.stdout.write(text)
     sys.stdout.write('\b' * len(text))
     sys.stdout.flush()
+
+    if fraction >= 1:
+        print()
 
 
 if __name__ == "__main__":

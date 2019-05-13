@@ -31,9 +31,10 @@ class SDownloader:
         else:
             years = [y for y in range(1999, datetime.now().year + 1)]
         paths = self.__download_paths(years)
+        handler(0, status="Downloading Statcast data")
         for i in range(0, len(paths)):
             _download(*paths[i])
-            handler((i + 1) / len(paths))
+            handler((i + 1) / len(paths), status="Downloading Statcast data")
 
     def __download_paths(self, years):
         """Gets all urls to download and paths to download them to"""

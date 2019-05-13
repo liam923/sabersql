@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import Utilities
 import math
+from ProgressHandler import ProgressHandler
 
 class SImporter:
 
@@ -33,21 +34,27 @@ class SImporter:
             years = [y for y in range(1999, datetime.now().year + 1)]
 
         year_prog = 0
+        handler(0, status="Importing Statcast data")
         for year in years:
             savant_path = os.path.join(self._path, "BaseballSavant", str(year))
-            files = Utilities._shell("find \"%s\" -name \"*.csv\"" % savant_path)[0].split("\n")
-            file_prog = 0
-            for csv, started in self.__year_files(year):
-                self.__start_progress(csv)
-                if started:
-                    self.__undo_progress(csv)
-                self.__import_dataframe(Utilities._import_csv(csv))
-                self.__end_progress(csv)
+            progress_handler = ProgressHandler(savant_path)
+            progress = progress_handler.get_progress()
+            if progress != ProgressHandler.FINISHED:
+                if progress == ProgressHandler.STARTED:
+                    self.__undo_sql_import(year)
+                progress_handler.start_progress()
 
-                file_prog += 1
-                handler(((file_prog / len(files)) * (1 / len(years))) + (year_prog / len(years)))
+                files = self.__year_files(year)
+                file_prog = 0
+                for csv in files:
+                    self.__import_dataframe(Utilities._import_csv(csv))
+                    file_prog += 1
+                    handler(((file_prog / len(files)) * (1 / len(years))) + (year_prog / len(years)),
+                            status="Importing Statcast data for %s" % year)
+
+                progress_handler.end_progress()
             year_prog += 1
-            handler(year_prog / len(years))
+            handler(year_prog / len(years), status="Importing Statcast data")
 
     def __import_dataframe(self, dataframe):
         """
@@ -92,63 +99,22 @@ class SImporter:
 
         savant_path = os.path.join(self._path, "BaseballSavant", str(year))
 
-        progress = {}
-        progress_file_path = os.path.join(savant_path, "import_progress.dat")
-        if os.path.isfile(progress_file_path):
-            with open(progress_file_path) as progress_file:
-                for line in progress_file:
-                    arr = line.rstrip().split(" : ")
-                    progress[arr[1]] = arr[0]
-
         files = []
         file_list = Utilities._shell("find \"%s\" -name \"*.csv\"" % savant_path)[0].split("\n")
         for csv in file_list:
             if csv:
-                if csv in progress:
-                    if progress[csv] == "started":
-                        files.append((csv, True))
-                else:
-                    files.append((csv, False))
+                files.append(csv)
 
         return files
 
-    def __start_progress(self, file):
+    def __undo_sql_import(self, year):
         """
-        Writes for the start of importing the file
+        Undoes all import progress to the database so far on a year
 
-        :param file: the file who's import began
-        """
-
-        message = "started : " + file
-        progress_file_path = os.path.join(os.path.dirname(file), "import_progress.dat")
-        Utilities._shell("echo \"%s\" >> \"%s\"" % (message, progress_file_path))
-
-    def __end_progress(self, file):
-        """
-        Writes for the end of importing the file
-
-        :param file: the file who's import finished
-        """
-
-        message = "finished : " + file
-        progress_file_path = os.path.join(os.path.dirname(file), "import_progress.dat")
-        Utilities._shell("echo \"%s\" >> \"%s\"" % (message, progress_file_path))
-
-    def __undo_progress(self, file):
-        """
-        Undoes all import progress so far on a file
-
-        :param file: the file to undo progress on
+        :param year: the year to undo progress on
         :raises ConnectionError: if the connection fails
         """
 
-        rest, first = os.path.split(file)
-        _, second = os.path.split(rest)
-        arr = first.split(".")[0].split("_")
+        self._connection._run("DELETE FROM pitch WHERE game_year=%s;" % year)
 
-        year = second
-        inning = arr[0]
-        outs = arr[1]
-
-        self._connection._run("DELETE FROM pitch WHERE inning=%s and outs_when_up=%s and year(game_date)=%s;" %
-                              (inning, outs, year))
+        os.remove(os.path.join(self._path, "BaseballSavant", "%s" % year, "progress.dat"))
