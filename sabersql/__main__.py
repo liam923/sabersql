@@ -12,7 +12,7 @@ import argparse
 
 
 def run(args=[]):
-    parser = argparse.ArgumentParser(description="Download Retrosheet and Statcast data, along with player data, and import it into a MySQL database. More information at https://github.com/liam923/sabersql")
+    parser = argparse.ArgumentParser(description="Download Retrosheet and BaseballSavant data, along with player data, and import it into a MySQL database. More information at https://github.com/liam923/sabersql")
 
     parser.add_argument("path", help='the folder to store files downloaded and processed by sabersql', type=str)
     parser.add_argument("-y", "--year", help="process only the given year (default: process all years)", type=int)
@@ -26,7 +26,7 @@ def run(args=[]):
     data_source_group = parser.add_mutually_exclusive_group()
     data_source_group.add_argument("--retrosheet", help="only process Retrosheet data",
                                    action="store_true")
-    data_source_group.add_argument("--statcast", help="only process Statcast data",
+    data_source_group.add_argument("--statcast", help="only process BaseballSavant data",
                                    action="store_true")
     data_source_group.add_argument("--people", help="only process people data",
                                    action="store_true")
@@ -37,7 +37,7 @@ def run(args=[]):
                         default="password")
     parser.add_argument("-a", "--address", help="the address of the MySQL database (default: %(default)s)",
                         default="localhost")
-    parser.add_argument("-n", "--database", help="the name of the MySQL database (default: %(default)s)",
+    parser.add_argument("-s", "--schema", help="the name of the MySQL database schema (default: %(default)s)",
                         default="sabersql")
 
     parsed = vars(parser.parse_args(args=args))
@@ -52,7 +52,7 @@ def run(args=[]):
     path = parsed['path']
 
     if parsed['import']:
-        connection = MySQLConnection.MySQLConnection(parsed['user'], parsed['pass'], parsed['database'],
+        connection = MySQLConnection.MySQLConnection(parsed['user'], parsed['pass'], parsed['schema'],
                                                      parsed['address'])
         connection.create_database()
 
