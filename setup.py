@@ -5,13 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="sabersql",
-    version="0.0.1",
+    version="1.0.0",
     author="William Stevenson",
-    author_email="liam923@verizon.net",
-    description="",
+    author_email="stevenson.w@husky.neu.edu",
+    description="SaberSQL is a tool to scrape baseball data from various sources and import it into a MySQL database.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/liam923/sabersql",
+    download_url="https://github.com/liam923/sabersql/archive/v1.0.0.tar.gz",
     packages=setuptools.find_packages(),
     install_requires=[
         'pandas',

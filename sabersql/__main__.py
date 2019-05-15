@@ -66,7 +66,7 @@ def run(args=[]):
 
     if parsed['statcast']:
         if parsed['download']:
-            s_dowloader = SDownloader.SDownloader(path)
+            s_downloader = SDownloader.SDownloader(path)
             s_downloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
             s_importer = SImporter.SImporter(path, connection)
@@ -94,7 +94,8 @@ def progress(fraction, status=''):
     sys.stdout.flush()
 
     if fraction >= 1:
-        print()
+        sys.stdout.write('\n')
+        sys.stdout.flush()
 
 
 def main():
