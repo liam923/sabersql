@@ -2,11 +2,11 @@
 
 from datetime import datetime
 import os
-import Utilities
+from . import Utilities
 import math
 import re
 import pandas
-from ProgressHandler import ProgressHandler
+from .ProgressHandler import ProgressHandler
 
 
 class RImporter:

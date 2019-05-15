@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from Utilities import _download
+from .Utilities import _download
 
 
 class PDownloader:

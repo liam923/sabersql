@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import Utilities
+from . import Utilities
 
 
 class ProgressHandler:

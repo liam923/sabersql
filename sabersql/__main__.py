@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-import SDownloader
-import SImporter
-import PDownloader
-import PImporter
-import RDownloader
-import RImporter
-import MySQLConnection
+from . import SDownloader
+from . import SImporter
+from . import PDownloader
+from . import PImporter
+from . import RDownloader
+from . import RImporter
+from . import MySQLConnection
 import sys
 import argparse
 
 
-def main(args=[]):
+def run(args=[]):
     parser = argparse.ArgumentParser(description="Download Retrosheet and Statcast data, along with player data, and import it into a MySQL database. More information at https://github.com/liam923/sabersql")
 
     parser.add_argument("path", help='the folder to store files downloaded and processed by sabersql', type=str)
@@ -58,27 +58,27 @@ def main(args=[]):
 
     if parsed['people']:
         if parsed['download']:
-            pdownloader = PDownloader.PDownloader(path)
-            pdownloader.download(handler=progress)
+            p_downloader = PDownloader.PDownloader(path)
+            p_downloader.download(handler=progress)
         if parsed['import']:
-            pimporter = PImporter.PImporter(path, connection)
-            pimporter.import_people_data(handler=progress)
+            p_importer = PImporter.PImporter(path, connection)
+            p_importer.import_people_data(handler=progress)
 
     if parsed['statcast']:
         if parsed['download']:
-            sdownloader = SDownloader.SDownloader(path)
-            sdownloader.download(handler=progress, year=parsed['year'])
+            s_dowloader = SDownloader.SDownloader(path)
+            s_downloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
-            simporter = SImporter.SImporter(path, connection)
-            simporter.import_statcast_data(handler=progress, year=parsed['year'])
+            s_importer = SImporter.SImporter(path, connection)
+            s_importer.import_statcast_data(handler=progress, year=parsed['year'])
 
     if parsed['retrosheet']:
         if parsed['download']:
-            rdownloader = RDownloader.RDownloader(path)
-            rdownloader.download(handler=progress, year=parsed['year'])
+            r_downloader = RDownloader.RDownloader(path)
+            r_downloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
-            rimporter = RImporter.RImporter(path, connection)
-            rimporter.import_retrosheet_data(handler=progress, year=parsed['year'])
+            r_importer = RImporter.RImporter(path, connection)
+            r_importer.import_retrosheet_data(handler=progress, year=parsed['year'])
 
 
 def progress(fraction, status=''):
@@ -97,5 +97,9 @@ def progress(fraction, status=''):
         print()
 
 
+def main():
+    sys.exit(run(args=sys.argv[1:]) or 0)
+
+
 if __name__ == "__main__":
-    sys.exit(main(args=sys.argv[1:]) or 0)
+    main()

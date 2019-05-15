@@ -2,8 +2,7 @@
 
 import os
 from datetime import datetime
-from Utilities import _download
-import time
+from .Utilities import _download
 
 
 class RDownloader:

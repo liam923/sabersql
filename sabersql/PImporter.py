@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import os
-import Utilities
+from . import Utilities
 import math
 import functools
-from ProgressHandler import ProgressHandler
+from .ProgressHandler import ProgressHandler
+
 
 class PImporter:
 

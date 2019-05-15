@@ -2,7 +2,7 @@
 
 import os
 from datetime import datetime
-from Utilities import _download
+from .Utilities import _download
 
 
 class SDownloader:

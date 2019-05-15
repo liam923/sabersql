@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from Utilities import _shell
-import Schemas
+from .Utilities import _shell
+from . import Schemas
 
 class MySQLConnection:
     """

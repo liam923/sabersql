@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/liam923/sabersql",
     packages=setuptools.find_packages(),
     install_requires=[
-        'pandas>=0.24.1',
+        'pandas',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

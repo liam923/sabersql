@@ -2,9 +2,9 @@
 
 from datetime import datetime
 import os
-import Utilities
+from . import Utilities
 import math
-from ProgressHandler import ProgressHandler
+from .ProgressHandler import ProgressHandler
 
 class SImporter:
 
