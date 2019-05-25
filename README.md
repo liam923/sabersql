@@ -44,6 +44,8 @@ then be omitted)
 
 - `--people` - only download and/or import player, umpire, and manager data
 
+- `--undo` - undoes the command instead
+
 #### Notes
 - Data will not be re-downloaded or re-imported if a command is run multiple times. Additionally, a process will resume
 from where it left off if restarted.
