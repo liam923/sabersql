@@ -16,6 +16,7 @@ def run(args=[]):
 
     parser.add_argument("path", help='the folder to store files downloaded and processed by sabersql', type=str)
     parser.add_argument("-y", "--year", help="process only the given year (default: process all years)", type=int)
+    parser.add_argument("--undo", help="undo the given process", action="store_true")
 
     import_download_group = parser.add_mutually_exclusive_group()
     import_download_group.add_argument("--download", help="only download the files without importing to the database",
@@ -59,26 +60,44 @@ def run(args=[]):
     if parsed['people']:
         if parsed['download']:
             p_downloader = PDownloader.PDownloader(path)
-            p_downloader.download(handler=progress)
+            if parsed['undo']:
+                p_downloader.undownload(handler=progress)
+            else:
+                p_downloader.download(handler=progress)
         if parsed['import']:
             p_importer = PImporter.PImporter(path, connection)
-            p_importer.import_people_data(handler=progress)
+            if parsed['undo']:
+                p_importer.unimport_people_data(handler=progress)
+            else:
+                p_importer.import_people_data(handler=progress)
 
     if parsed['statcast']:
         if parsed['download']:
             s_downloader = SDownloader.SDownloader(path)
-            s_downloader.download(handler=progress, year=parsed['year'])
+            if parsed['undo']:
+                s_downloader.undownload(handler=progress, year=parsed['year'])
+            else:
+                s_downloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
             s_importer = SImporter.SImporter(path, connection)
-            s_importer.import_statcast_data(handler=progress, year=parsed['year'])
+            if parsed['undo']:
+                s_importer.unimport_statcast_data(handler=progress, year=parsed['year'])
+            else:
+                s_importer.import_statcast_data(handler=progress, year=parsed['year'])
 
     if parsed['retrosheet']:
         if parsed['download']:
             r_downloader = RDownloader.RDownloader(path)
-            r_downloader.download(handler=progress, year=parsed['year'])
+            if parsed['undo']:
+                r_downloader.undownload(handler=progress, year=parsed['year'])
+            else:
+                r_downloader.download(handler=progress, year=parsed['year'])
         if parsed['import']:
             r_importer = RImporter.RImporter(path, connection)
-            r_importer.import_retrosheet_data(handler=progress, year=parsed['year'])
+            if parsed['undo']:
+                r_importer.unimport_retrosheet_data(handler=progress, year=parsed['year'])
+            else:
+                r_importer.import_retrosheet_data(handler=progress, year=parsed['year'])
 
 
 def progress(fraction, status=''):

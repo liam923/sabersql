@@ -78,6 +78,23 @@ class PImporter:
             progress_handler.end_progress()
         handler(1, status=status)
 
+    def unimport_people_data(self, handler=lambda *args: None):
+        """
+        Undoes import of all people data from MySQL database
+
+        :param handler: a function that takes in a double, representing the completion percentage of the import undoing
+        :raises ConnectionError: if the connection fails
+        """
+
+        status = "Undoing people import"
+        handler(0, status=status)
+        progress_handler = ProgressHandler(os.path.join(self._path, "Person"))
+        progress = progress_handler.get_progress()
+        if progress != ProgressHandler.NONE:
+            progress_handler.start_progress()
+            self.__undo_sql_import()
+        handler(1, status=status)
+
     def __import_people_from_file(self, url, handler):
         batch_size = 1000
 

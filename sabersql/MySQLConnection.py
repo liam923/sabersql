@@ -33,7 +33,7 @@ class MySQLConnection:
         :return: the stdout of running the command
         :raises ConnectionError: if the connection fails
         """
-
+        return
         if use_database:
             stdout, stderr = _shell("export MYSQL_PWD=%s; mysql -u%s %s -B -e \"%s\"" %
                                     (self._password, self._username, self._database, command))

@@ -3,6 +3,7 @@
 import os
 from datetime import datetime
 from .Utilities import _download
+from .Utilities import _shell
 
 
 class SDownloader:
@@ -35,6 +36,24 @@ class SDownloader:
         for i in range(0, len(paths)):
             _download(*paths[i])
             handler((i + 1) / len(paths), status="Downloading Statcast data")
+
+    def undownload(self, year=None, handler=lambda *args: None):
+        """
+        Undoes downloads of BaseballSavant files
+
+        :param year: the year to be un-downloaded; defaults to all years 1999 to present
+        :param handler: a function that takes in a double, representing the completion percentage of the un-download
+        """
+
+        if year:
+            years = [year]
+        else:
+            years = [y for y in range(1999, datetime.now().year + 1)]
+        paths = self.__download_paths(years)
+        handler(0, status="Undoing Statcast download")
+        for i in range(0, len(paths)):
+            _shell("rm \"%s\"" % paths[i][1])
+            handler((i + 1) / len(paths), status="Undoing Statcast download")
 
     def __download_paths(self, years):
         """Gets all urls to download and paths to download them to"""

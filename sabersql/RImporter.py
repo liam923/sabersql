@@ -45,6 +45,29 @@ class RImporter:
             year_prog += 1
             handler(year_prog / len(years), status="Importing Retrosheet data for %s" % year)
 
+    def unimport_retrosheet_data(self, year=None, handler=lambda *args: None):
+        """
+        Undoes import of all Retrosheet data from MySQL database
+
+        :param year: the year to be unimported; defaults to all years 1903 to present
+        :param handler: a function that takes in a double, representing the completion percentage of the import undoing
+        :raises ConnectionError: if the connection fails
+        """
+
+        if year:
+            years = [year]
+        else:
+            years = [y for y in range(1903, datetime.now().year + 1)]
+
+        handler(0, status="Undoing Retrosheet import")
+        year_prog = 0
+        for year in years:
+            self.__unchadwick(year)
+            self.__unsql(year)
+
+            year_prog += 1
+            handler(year_prog / len(years), status="Undoing Retrosheet import for %s" % year)
+
     def __chadwick(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "raw_event_files", "%s" % year)
         out_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
@@ -104,6 +127,22 @@ class RImporter:
             progress_handler.end_progress()
             ProgressHandler(out_folder).start_progress()
 
+    def __unchadwick(self, year):
+        in_folder = os.path.join(self._path, "Retrosheet", "raw_event_files", "%s" % year)
+        out_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
+
+        progress_handler = ProgressHandler(in_folder)
+        if progress_handler.get_progress() != ProgressHandler.NONE:
+            progress_handler.start_progress()
+
+            for filename in os.listdir(out_folder):
+                full_path = os.path.join(out_folder, filename)
+                print(full_path)
+                if os.path.isdir(full_path):
+                    Utilities._shell("rm -rf \"%s\"" % full_path)
+
+            Utilities._shell("rm \"%s\"" % os.path.join(in_folder, "progress.dat"))
+
     def __sql(self, year):
         in_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
 
@@ -133,6 +172,14 @@ class RImporter:
                         self.__import_dataframe(sub_data, "sub")
 
             progress_handler.end_progress()
+
+    def __unsql(self, year):
+        in_folder = os.path.join(self._path, "Retrosheet", "processed", "%s" % year)
+
+        progress_handler = ProgressHandler(in_folder)
+        progress = progress_handler.get_progress()
+        if progress != ProgressHandler.NONE:
+            self.__undo_sql_import(year)
 
     def __import_dataframe(self, dataframe, table, fields={}):
         """
@@ -215,7 +262,7 @@ class RImporter:
         """
 
         self._connection._run("DELETE FROM event WHERE GAME_ID REGEXP '.{3}%s.{5}';" % year)
-        self._connection._run("DELETE FROM game WHERE GAME_ID REGEXP '.{3}%s.{5}';" % year)
+        self._connection._run("DELETE FROM game WHERE year(GAME_DT) = %s;" % year)
         self._connection._run("DELETE FROM sub WHERE GAME_ID REGEXP '.{3}%s.{5}';" % year)
 
         os.remove(os.path.join(self._path, "Retrosheet", "processed", "%s" % year, "progress.dat"))

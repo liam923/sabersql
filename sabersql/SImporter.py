@@ -56,6 +56,32 @@ class SImporter:
             year_prog += 1
             handler(year_prog / len(years), status="Importing Statcast data")
 
+    def unimport_statcast_data(self, year=None, handler=lambda *args: None):
+        """
+        Undoes import of BaseballSavant data to MySQL database
+
+        :param year: the year to be ub-imported; defaults to all years 1999 to present
+        :param handler: a function that takes in a double, representing the completion percentage of the import undoing
+        :raises ConnectionError: if the connection fails
+        """
+
+        if year:
+            years = [year]
+        else:
+            years = [y for y in range(1999, datetime.now().year + 1)]
+
+        year_prog = 0
+        handler(0, status="Undoing Statcast import")
+        for year in years:
+            savant_path = os.path.join(self._path, "BaseballSavant", str(year))
+            progress_handler = ProgressHandler(savant_path)
+            progress = progress_handler.get_progress()
+            if progress != ProgressHandler.NONE:
+                progress_handler.start_progress()
+                self.__undo_sql_import(year)
+            year_prog += 1
+            handler(year_prog / len(years), status="Undoing Statcast import")
+
     def __import_dataframe(self, dataframe):
         """
         Imports data from dataframe to MySQL
@@ -115,6 +141,6 @@ class SImporter:
         :raises ConnectionError: if the connection fails
         """
 
-        self._connection._run("DELETE FROM pitch WHERE game_year=%s;" % year)
+        self._connection._run("DELETE FROM pitch WHERE year(game_date)=%s;" % year)
 
         os.remove(os.path.join(self._path, "BaseballSavant", "%s" % year, "progress.dat"))
