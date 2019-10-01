@@ -90,7 +90,7 @@ class SImporter:
         :raises ConnectionError: if the connection fails
         """
 
-        def make_cell(cell):
+        def make_cell(cell, first):
             t = type(cell)
             if t is int or t is float:
                 if math.isnan(cell):
@@ -98,7 +98,7 @@ class SImporter:
                 else:
                     return str(cell)
             elif t is str:
-                if cell == "null":
+                if cell == "null" or (first and len(cell) > 2):
                     return "NULL"
                 else:
                     return "\'" + cell.replace("\'", "\\\'") + "\'"
@@ -106,8 +106,10 @@ class SImporter:
                 raise TypeError("Unrecognized cell type: %s" % str(t))
 
         def make_row(row):
+            first = True
             for cell in row:
-                yield make_cell(cell)
+                yield make_cell(cell, first)
+                first = False
 
         def make_data(dataframe):
             for row in dataframe.values:
@@ -141,6 +143,6 @@ class SImporter:
         :raises ConnectionError: if the connection fails
         """
 
-        self._connection._run("DELETE FROM pitch WHERE year(game_date)=%s;" % year)
+        self._connection._run("DELETE FROM pitch WHERE game_year=%s;" % year)
 
         os.remove(os.path.join(self._path, "BaseballSavant", "%s" % year, "progress.dat"))
